@@ -23,3 +23,4 @@ du(x,y)/dx = 0 (at x = 1)
 Analytical Solution: u(x,y) = cos(pi * x)* sinh(pi* y)
 
 # Results
+![Screenshot 2022-01-02 212630](https://user-images.githubusercontent.com/73020056/147888619-99e38ad6-623b-4c16-8b90-f3cb6196daf9.png)

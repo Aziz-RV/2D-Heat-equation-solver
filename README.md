@@ -25,3 +25,10 @@ Analytical Solution: u(x,y) = cos(pi * x)* sinh(pi* y)
 
 # Results
 ![Screenshot 2022-01-02 212630](https://user-images.githubusercontent.com/73020056/147888619-99e38ad6-623b-4c16-8b90-f3cb6196daf9.png)
+
+# Building 
+This project was made on Linux, you can run it easily using the Cmakelist.txt.
+-Open Terminal in the root of ./build  
+  -wrrite "cmake ./src/"
+  -write "make"  
+  -./heat_equation_app or ./TEST_Dirichlet or (other tests)

@@ -28,7 +28,7 @@ Analytical Solution: u(x,y) = cos(pi * x)* sinh(pi* y)
 
 # Building 
 This project was made on Linux, you can run it easily using the Cmakelist.txt.
--Open Terminal in the root of ./build  
-  -wrrite "cmake ./src/"
+-Open Terminal in the root of ./build   
+  -wrrite "cmake ./src/"  
   -write "make"  
   -./heat_equation_app or ./TEST_Dirichlet or (other tests)

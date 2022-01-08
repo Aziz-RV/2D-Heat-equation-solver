@@ -1,0 +1,8 @@
+h , Error
+for the step size :0.2 we have an error of :0.0946752
+
+for the step size :0.1 we have an error of :0.0251623
+
+for the step size :0.05 we have an error of :0.00637794
+
+for the step size :0.025 we have an error of :0.00159981

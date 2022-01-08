@@ -137,7 +137,7 @@ void dirichlett_boundary(double u_x0, double u_xL, double u_y0, double u_yL
 
 
 
-void neumann_dirichlett_boundary(double u_xL,double u_x0, double u_y0, double u_yL ,Eigen::VectorXd& RHS, Eigen::MatrixXi& Mesh)
+void neumann_dirichlett_boundary(double u_x0,double u_xL, double u_y0, double u_yL ,Eigen::VectorXd& RHS, Eigen::MatrixXi& Mesh)
 {   
     std:: cout << "Working on RHS vector" << std::endl;
     int Nx = Mesh.cols();

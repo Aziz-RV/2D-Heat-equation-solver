@@ -3,9 +3,9 @@
 Gauss_Seidel_Solver::Gauss_Seidel_Solver(Eigen::SparseMatrix<double> A,
                     Eigen::VectorXd b)
                 :Linear_Solver(A,b)
-    {
-        std::cout << "Preparing Gauss-Seidel Solver"<<std::endl;
-    }
+{
+    std::cout << "Preparing Gauss-Seidel Solver"<<std::endl;
+}
 
 Eigen::VectorXd Gauss_Seidel_Solver:: solve_system() 
 {

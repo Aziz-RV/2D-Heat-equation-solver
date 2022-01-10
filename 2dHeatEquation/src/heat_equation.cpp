@@ -2,27 +2,30 @@
 #include "solvers/neumanndirichlet_solver.h"
 #include "solvers/dirichlet_solver.h"
 
-// we can add all the includes but they are already in utilities.h
-
+/*
+    The main file asks the user to enter the domain in which the pde will be solved.
+    Then it prompts the user to enter the type of boundary conditions as well as the
+    mesh-size that is needed.
+*/
 
 int main()
 {
     std::cout << "Enter the domain:" << std::endl;
     std::cout << "Enter the initial and final x-value:" << std::endl;
-    const double x0;
-    const double xL;
+    double x0;
+    double xL;
     std::cout << "Enter the initial of x:" ;
     std::cin >> x0;
     std::cout << "and the final value of x:" ;
     std::cin >> xL;
-    const double y0;
-    const double yL;
+    double y0;
+    double yL;
     std::cout << "Enter the initial of y:" ;
     std::cin >> y0;
     std::cout << "and the final value of y:" ;
     std::cin >> yL;
-    const double hx; // mesh size
-    const double hy; // mesh size
+    double hx; // mesh size
+    double hy; // mesh size
     std::cout << "Enter the mesh size in x and y:" << std::endl;
     std::cout<<"hx= ";std::cin >> hx;
     std::cout<<"hy= ";std::cin >> hy;

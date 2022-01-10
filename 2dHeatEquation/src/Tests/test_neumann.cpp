@@ -1,18 +1,26 @@
 #include "utilities.h" 
 #include <math.h>
-// we can add all the includes but they are already in utilities.h
 
+/*
+        This function is only necessary for this test case where a boundary prescription 
+        is a function and not a value.
 
+        This function assembles the RHS vector when the boundary value has a specific functional value.
 
+        @params N: number of elements in right hand side vector
+        @params h: meshsize
+        @params u_xL: neumann boundary value ((du/dx)*h = u_xL)
+        @params u_y0: dirichlet boundary valye u(x,0)
+        @params X: matrix with x-coordinates of grid points
+        @params Y: matrix with y-coordinates of grid points
+        @return RHS: the right hand side vector of discretized linear system which accounts for boundary values
+*/
 Eigen::VectorXd neumann_boundary_function(int N,double h, double u_xL, double u_y0, 
                                             Eigen::MatrixXd& X,Eigen::MatrixXd& Y)
 {
-    /*
-        This function is only necessary for this test case where a boundary prescription 
-        is a function and not a value.
-    */
+
     Eigen::VectorXd RHS(N*N);
-    RHS= Eigen::VectorXd::Zero(N*N);//we don't know we are intializing RHS to 0 but this way everything is working
+    RHS= Eigen::VectorXd::Zero(N*N);
     double num;
     double u_yL;
     double u_x0;
@@ -34,8 +42,8 @@ Eigen::VectorXd neumann_boundary_function(int N,double h, double u_xL, double u_
     {
 
         num = X(0,i);
-        u_yL = cos(pi*num)*std::sinh(pi); // since u(x,L) = sin(pi*x)*sinh(pi) the values of x-coordinate are needed
-                                        // and this is just any row of the X-matrix, values of Y are not needed.  
+        u_yL = cos(pi*num)*std::sinh(pi); 
+                                         
         RHS(y*N + i) = u_y0;
 
         RHS(Ly*N + i) = u_yL;
@@ -43,6 +51,21 @@ Eigen::VectorXd neumann_boundary_function(int N,double h, double u_xL, double u_
     return RHS;
 }
 
+
+/*
+    Performs all the necessary tasks to solve the steady state heat equation. 
+    - Meshing (discretizing)
+    - Preparing Meshgrid (& writing it to a csv file)
+    - Assembling RHS vector
+    - Assembling system matrix
+    - Solving linear system using LU_Solver (from Eigen) & writing it to a csv file.
+    - Reading the reference files to obtain the reference solution
+    - Compute inf-norm between the reference and the numerical solution.
+
+    @params h: meshsize
+    @params ref_filename: name of the file the contains the reference solution vector
+    @params solution_filename": name of the file in which the solution vector will be written.
+*/
 void pde_neumann_solver_test(double h, 
                                     std::string ref_filename,std::string solution_filename)
 {
@@ -55,9 +78,9 @@ void pde_neumann_solver_test(double h,
 
     int y0 = 0;
     int yL = 1;
-    double hy = h; // mesh size
-    int Ny = (yL-y0)/hy +1; // No. of rows
-    // Meshing
+    double hy = h; 
+    int Ny = (yL-y0)/hy +1; 
+
     Eigen::MatrixXi Mesh(Ny,Nx); 
     discretize_domain(Mesh);
 
@@ -69,37 +92,35 @@ void pde_neumann_solver_test(double h,
 
     Eigen::VectorXd RHS(Nx*Ny);
     
-    double u_xL = 0; // du/dx (L,y) = 0
-    double u_y0 = 0; // u(x,0) = 0
+    double u_xL = 0; 
+    double u_y0 = 0; 
     
     RHS=neumann_boundary_function(Nx,h, u_xL ,u_y0, X, Y);
 
     Eigen::SparseMatrix<double> A(Nx*Ny, Nx*Ny);
     matrix_assemply_neumann_dirichlet(A, Mesh);
     
-
     Eigen::VectorXd U(Nx*Ny);
     U=LU_method(A,RHS);
   
-    
-    // Save result to csv
     write_result_vector_to_csv(U,solution_filename);
     Eigen::VectorXd _reference(Nx*Ny);
     read_real_solution_from_csv(_reference, ref_filename);
 
-     double error;
-     error = error_estimation_inf_norm(U,_reference); 
-     std::cout << "for the step size :"<<h << " we have an error of :"<< error << std::endl;
+    double error;
+    error = error_estimation_inf_norm(U,_reference); 
+    std::cout << "for the step size :"<<h << " we have an error of :"<< error << std::endl;
     
-
 }
 
 
 int main()
 {
     /*
-        We are going to make a convergence test with these values of step size: (0.2,0.1,0.05,0.025)
-        and check if it converges and if the error is divided by 4 for every halving.   
+        This runs a convergence test for the Dirichlet boundaries for the steady state heat equation on a square domain.
+        The error should become halved when the meshsize is halved. 
+        This indicates that the method has O(1) convergence as we used a first order difference method 
+        for Neumann boundary.
     */
     Eigen::Vector4d h(0.2,0.1,0.05,0.025); // Mesh sizes for convergence test
     std::cout << "h , Error" << std::endl;

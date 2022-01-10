@@ -1,13 +1,19 @@
 #include "utilities.h"
 
 
+/*
+    Writes the meshgrid to a .csv file which can be used to plotting
+    using python or matlab.
+
+    @params X: matrix with x-coordinates of all grid points
+    @params X: matrix with y-coordinates of all grid points
+    @params filename: name of file in which meshgrid is written
+
+*/
 void write_meshgrid_to_csv(Eigen::MatrixXd& X, Eigen::MatrixXd& Y,
                   std::string filename)
 {
-    /*
-        Writes the meshgrid to a file which can be used to plotting
-        using python or matlab.
-    */
+
     std::ofstream csv_file(filename);
 
     for (int i = 0; i < X.rows();i++)
@@ -23,12 +29,16 @@ void write_meshgrid_to_csv(Eigen::MatrixXd& X, Eigen::MatrixXd& Y,
 }
 
 
+/*
+    Writes the result vector to a .csv file
+
+    @params result: the result vector which is written to .csv file.
+    @params filename: name of the file in which the result vector is written.
+*/
 void write_result_vector_to_csv(Eigen::VectorXd& result, 
                   std::string filename)
 {
-    /*
-        Writes the solution vector to a csv file.
-    */
+
     std::ofstream csv_file(filename);
     for (int i = 0; i < result.size() ; i++)
     {
@@ -37,17 +47,21 @@ void write_result_vector_to_csv(Eigen::VectorXd& result,
     csv_file.close();
 }
 
+/*
+    Reads the real solution from a .csv file and writes it to a vector.
 
+    @params filename: name of file which is read.
+    @params _reference: vector on which the data of the file is written to.
+
+*/
 void read_real_solution_from_csv(Eigen::VectorXd& _reference, std::string filename )
 {
-    /*
-        Reads the real solution from a csv file 
-    */
+
     std::fstream csv_file;
     csv_file.open(filename,std::ios::in); //open the file
     int i=0;
     if (csv_file.is_open())
-    {   //checking whether the file is open
+    {   
         std::string tp;
         while( std::getline(csv_file, tp))
         { //read data from file  and put it into string.
@@ -62,12 +76,15 @@ void read_real_solution_from_csv(Eigen::VectorXd& _reference, std::string filena
 
 
 
+/*
+    Discretizes the domain and each grid point is numbered in a 
+    lexicohraphical fashion. It is needed for contructing other functions.
+
+    @params Mesh: matrix which contains the numbering of each grid point.
+*/
 void discretize_domain(Eigen::MatrixXi& Mesh)
 {   
-    /*
-        Discretizes the domain and each grid point is numbered in a 
-        lexicohraphical fashion. It is needed for contructing other functions.
-    */
+
     int Ny = Mesh.rows();
     int Nx = Mesh.cols();
     int m = 0;
@@ -83,14 +100,19 @@ void discretize_domain(Eigen::MatrixXi& Mesh)
 }
 
 
+/*
+    Constructs the X and Y coordinate matrices which are used later to 
+    plot the resulting vector in a 2D domain. 
 
+    @params hx: meshsize along x-direction
+    @params hy: meshsize along y-direction
+    @params X: matrix that will contain the x-coordinates of each grid point of discretized domain.
+    @params Y: matrix that will contain the y-coordinates of each grid point of doscretized domain.
+*/
 void meshgrid(double hx, double hy, Eigen::MatrixXd& X, 
                                     Eigen::MatrixXd& Y)
 {
-    /*
-        Constructs the X and Y coordinate matrices which are used later to 
-        plot the resulting vector in a 2D domain. 
-    */
+
     int Ny = X.rows();
     int Nx = X.cols();
     for (int i = 0; i < Ny; i++)
@@ -104,7 +126,17 @@ void meshgrid(double hx, double hy, Eigen::MatrixXd& X,
 }
 
 
+/*
+    Takes the boundary values corresponding to the Dirichlet Boundary condition and 
+    assembles the RHS vector.
 
+    @params: u_x0: value  of u(0,y)
+    @params: u_xL: value  of u(L,y)
+    @params: u_y0: value  of u(x,0)
+    @params: u_yL: value  of u(x,L)
+    @params: RHS: vector on which the boundary values will be added.
+    @params: Mesh: Matrix which contains numbering of grid points.
+*/
 void dirichlett_boundary(double u_x0, double u_xL, double u_y0, double u_yL
                         ,Eigen::VectorXd& RHS, Eigen::MatrixXi& Mesh)
 {   
@@ -112,14 +144,12 @@ void dirichlett_boundary(double u_x0, double u_xL, double u_y0, double u_yL
     int Nx = Mesh.cols();
     int Ny = Mesh.rows();
 
-    int x = 0; // First Column
-    int Lx = Nx-1; // Last column
+    int x = 0; 
+    int Lx = Nx-1; 
     for (int j = 0; j < Nx; j++)
     {   
-        RHS(x + j*Ny) = u_x0;       // Makes First column 0 // u(0,y) =  0
-        //std::cout<< x + j*Ny << ':' << u_x0 << std::endl;
-        RHS(Lx + j*Ny) = u_xL;      // Makes Last Column 0 // u(L,y) = 0
-        //std::cout<< Lx + j*Ny << ':' << u_xL << std::endl;
+        RHS(x + j*Ny) = u_x0;   
+        RHS(Lx + j*Ny) = u_xL;      
     } 
     
     int y = 0;
@@ -127,30 +157,35 @@ void dirichlett_boundary(double u_x0, double u_xL, double u_y0, double u_yL
     for (int i = 0; i < Ny-1; i++)
     {
         RHS(y*Nx + i) = u_y0;
-        //std::cout<< y*Nx + i << ':' << u_y0 << std::endl;
         RHS(Ly*Nx + i) = u_yL;
-        //std::cout<< Ly*Nx + i << ':' << u_yL << std::endl;
     }
 
 }
 
 
+/*
+    Takes the boundary values corresponding to the Neumann-Dirichlet Boundary condition and 
+    assembles the RHS vector.
 
-
+    @params: u_x0: value  of u(0,y)
+    @params: u_xL: value  of du/dx(L,y)*hx (user enters du/dx(L,y))
+    @params: u_y0: value  of u(x,0)
+    @params: u_yL: value  of u(x,L)
+    @params: RHS: vector on which the boundary values will be added.
+    @params: Mesh: Matrix which contains numbering of grid points.
+*/
 void neumann_dirichlett_boundary(double u_x0,double u_xL, double u_y0, double u_yL ,Eigen::VectorXd& RHS, Eigen::MatrixXi& Mesh)
 {   
     std:: cout << "Working on RHS vector" << std::endl;
     int Nx = Mesh.cols();
     int Ny = Mesh.rows();
 
-    int x = 0; // First Column
-    int Lx = Nx-1; // Last column
-    for (int j = 1; j < Nx-1; j++) // changed things here
+    int x = 0; 
+    int Lx = Nx-1; 
+    for (int j = 1; j < Nx-1; j++) 
     {   
-        RHS(x + j*Ny) = u_x0;       // Makes First column 0 // u(0,y) =  0
-        //std::cout<< x + j*Ny << ':' << u_x0 << std::endl;
-        RHS(Lx + j*Ny) = u_xL;      // Makes Last Column L // (du/dx)(L,y) = g(j)
-        //std::cout<< Lx + j*Ny << ':' << u_xL << std::endl;
+        RHS(x + j*Ny) = u_x0;      
+        RHS(Lx + j*Ny) = u_xL;     
     } 
     
     int y = 0;
@@ -158,51 +193,26 @@ void neumann_dirichlett_boundary(double u_x0,double u_xL, double u_y0, double u_
     for (int i = 0; i < Ny; i++)
     {
         RHS(y*Nx + i) = u_y0;
-        //std::cout<< y*Nx + i << ':' << u_y0 << std::endl;
         RHS(Ly*Nx + i) = u_yL;
-        //std::cout<< Ly*Nx + i << ':' << u_yL << std::endl;
     }
 
 }
 
-//not used
-void neumann_boundary(double du_xL,double du_x0, double du_y0, double du_yL ,Eigen::VectorXd& RHS, Eigen::MatrixXi& Mesh)
-{   
-    std:: cout << "Working on RHS vector" << std::endl;
-    int Nx = Mesh.cols();
-    int Ny = Mesh.rows();
 
-    int x = 0; // First Column
-    int Lx = Nx-1; // Last column
-    for (int j = 1; j < Nx-1; j++) // changed things here
-    {   
-        RHS(x + j*Ny) = du_x0;       // Makes First column 0 // du/dx(0,y) =  g(1)
-        //std::cout<< x + j*Ny << ':' << u_x0 << std::endl;
-        RHS(Lx + j*Ny) = du_xL;      // Makes Last Column L // (du/dx)(L,y) = g(2)
-        //std::cout<< Lx + j*Ny << ':' << u_xL << std::endl;
-    } 
+
+
+/*
+    Assembles the system matrix for the system with Dirichlet boundaries. 
+    The system matrix A is the discretized version of the Laplacian which accounts for the
+    boundary values.
     
-    int y = 0;
-    int Ly = Ny-1;
-    for (int i = 0; i < Ny; i++)
-    {
-        RHS(y*Nx + i) = du_y0;// du/dy(x,0) =  g(3)
-        //std::cout<< y*Nx + i << ':' << u_y0 << std::endl;
-        RHS(Ly*Nx + i) = du_yL;//du/dy(x,0) =  g(3)
-        //std::cout<< Ly*Nx + i << ':' << u_yL << std::endl;
-    }
-
-}
-
-
+    @params A: Sparse system matrix
+    @params Mesh: Matrix which contains numbering of grid points.
+*/
 void matrix_assemply_dirichlet(Eigen::SparseMatrix<double> &A, Eigen::MatrixXi& Mesh)
 {   
     std:: cout << "Started Matrix Assembly" << std::endl;
-    /*
-        This function constructs system matrix for the discretized system.
-        This system matrix takes depends on the boundary conditions and is the discretized form
-        of the laplacian operator.
-    */
+
     int Ny = Mesh.rows();
     int Nx = Mesh.cols();
     int N = (Nx)*(Ny);
@@ -235,14 +245,19 @@ void matrix_assemply_dirichlet(Eigen::SparseMatrix<double> &A, Eigen::MatrixXi& 
     }
 }
 
+
+/*
+    Assembles the system matrix for the system with mixed boundaries. 
+    The system matrix A is the discretized version of the Laplacian which accounts for the
+    boundary values.
+    
+    @params A: Sparse system matrix
+    @params Mesh: Matrix which contains numbering of grid points.
+*/
 void matrix_assemply_neumann_dirichlet(Eigen::SparseMatrix<double> &A, Eigen::MatrixXi& Mesh)
 {
     std:: cout << "Started Matrix Assembly" << std::endl;
-    /*
-        This function constructs system matrix for the discretized system.
-        This system matrix takes depends on the boundary conditions and is the discretized form
-        of the laplacian operator.
-    */
+
     int Ny = Mesh.rows();
     int Nx = Mesh.cols();
     int N = (Nx)*(Ny);
@@ -275,60 +290,18 @@ void matrix_assemply_neumann_dirichlet(Eigen::SparseMatrix<double> &A, Eigen::Ma
         }
     }
 }
-//not used 
-void matrix_assemply_neumann(Eigen::SparseMatrix<double> &A, Eigen::MatrixXi& Mesh)
-{
-    std:: cout << "Started Matrix Assembly" << std::endl;
-    /*
-        This function constructs system matrix for the discretized system.
-        This system matrix takes depends on the boundary conditions and is the discretized form
-        of the laplacian operator.
-    */
-    int Ny = Mesh.rows();
-    int Nx = Mesh.cols();
-    int N = (Nx)*(Ny);
-
-    int Lx = Nx-1;
-     A.reserve(Eigen::VectorXi::Constant(A.cols(),6));
-    for (int j = 1; j< Nx-1; j++)
-    {
-        A.coeffRef(j*Ny,j*Ny) = 1;
-        A.coeffRef(j*Ny,j*Ny+1) = -1;
-        A.coeffRef(Lx + j*Ny, Lx + j*Ny) = 1;
-        A.coeffRef(Lx + j*Ny, (Lx + j*Ny)-1) = -1;
-    }
-
-    int Ly = Ny-1;
-    for  (int i = 0; i < Ny; i++)
-    {
-        A.coeffRef(i,i) = 1;
-        A.coeffRef(i,i+Nx) = -1;
-
-        A.coeffRef(Ly*Nx + i,Ly*Nx + i) = 1;
-        A.coeffRef(Ly*Nx + i,Ly*Nx + i-Nx) = -1;
-        
-
-    }
-
-     for (int i = 0; i < N; i++)
-    {
-        if(A.coeffRef(i,i) != 1)
-        {
-            A.coeffRef(i,i) = -4;
-            A.coeffRef(i,i+1) = 1;
-            A.coeffRef(i,i-1) = 1;
-            A.coeffRef(i, i+ Ny) = 1;
-            A.coeffRef(i, i - Ny) = 1;
-        }
-    }
-}
 
 
+/*
+    Solves the linear sparse system using the LU solver from Eigen.
+
+    @params A: Sparse system matrix
+    @params vec: the right hand side vector of linear system.
+    @return result: solution vector of linear system.
+*/
 Eigen::VectorXd LU_method(Eigen::SparseMatrix<double> &A,Eigen::VectorXd &vec)
 {
-    /*
-        Solves the linear system to obtain the solution vector 
-    */
+
     std::cout << "Solving system now" << std::endl;
     Eigen::SparseLU<Eigen::SparseMatrix<double>, Eigen::COLAMDOrdering<int>>   solver;
     solver.analyzePattern(A); 
@@ -337,15 +310,28 @@ Eigen::VectorXd LU_method(Eigen::SparseMatrix<double> &A,Eigen::VectorXd &vec)
     return x;
 }
 
+
+/*
+    Computes the error between the numerical and real solution with respect to 2-norm
+
+    @param x_numerical: numerical solution of pde
+    @param real_x: real solution of pde
+    @return : 2-norm of the difference of x_numerical and real_x
+*/
 double error_estimation(Eigen::VectorXd &x_numerical,Eigen::VectorXd &real_x ) // Error with 2-norm
 {   
-    /*
-        Computes the 2-norm of the error in solution vector and the real solution 
-    */
     Eigen::VectorXd error_vector= real_x-x_numerical;
     return error_vector. squaredNorm(); 
 }
 
+
+/*
+    Computes the error between the numerical and real solution with respect to infinity-norm
+
+    @param x_numerical: numerical solution of pde
+    @param real_x: real solution of pde
+    @return error: inf-norm of the difference of x_numerical and real_x
+*/
 double error_estimation_inf_norm(Eigen::VectorXd &x_numerical,Eigen::VectorXd &real_x )
 {   
     double error = 0;
@@ -361,6 +347,17 @@ double error_estimation_inf_norm(Eigen::VectorXd &x_numerical,Eigen::VectorXd &r
     return error;
 }
 
+
+/*
+    Solves the linear system using the Jacobi Method. The user can enter the maximum 
+    number of iterations allowed. The method stops either when the error between the 
+    real solution and computed solution is smaller than a tolerance value or when the
+    number of interations exceeds the maximum number of interations.
+
+    @params A: sparse system matrix
+    @params b: right hand side vector of linear system.
+    @return x: solution of linear system Ax = b.
+*/
 Eigen::VectorXd jacobi_method(Eigen::SparseMatrix<double>& A, Eigen::VectorXd& b)
 {
     std::cout<< "max iterations :";
@@ -404,7 +401,16 @@ Eigen::VectorXd jacobi_method(Eigen::SparseMatrix<double>& A, Eigen::VectorXd& b
 }
 
 
+/*
+    Solves the linear system using the Gauss-Seidel Method. The user can enter the maximum 
+    number of iterations allowed. The method stops either when the error between the 
+    real solution and computed solution is smaller than a tolerance value or when the
+    number of interations exceeds the maximum number of interations.
 
+    @params A: sparse system matrix
+    @params b: right hand side vector of linear system.
+    @return x: solution of linear system Ax = b.
+*/
 Eigen::VectorXd gauss_seidel(Eigen::SparseMatrix<double>& A, Eigen::VectorXd& b)
 {
     std::cout<< "max iterations :";
@@ -450,3 +456,91 @@ Eigen::VectorXd gauss_seidel(Eigen::SparseMatrix<double>& A, Eigen::VectorXd& b)
     // std::cout << "Result is: " << x << std::endl;
     return x;
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/*
+     Not working at the moment, might include these later
+
+*/    
+
+// For all boundaries Neumann
+// void neumann_boundary(double du_xL,double du_x0, double du_y0, double du_yL ,Eigen::VectorXd& RHS, Eigen::MatrixXi& Mesh)
+// {   
+//     std:: cout << "Working on RHS vector" << std::endl;
+//     int Nx = Mesh.cols();
+//     int Ny = Mesh.rows();
+
+//     int x = 0; // First Column
+//     int Lx = Nx-1; // Last column
+//     for (int j = 1; j < Nx-1; j++) // changed things here
+//     {   
+//         RHS(x + j*Ny) = du_x0;       // Makes First column 0 // du/dx(0,y) =  g(1)
+//         //std::cout<< x + j*Ny << ':' << u_x0 << std::endl;
+//         RHS(Lx + j*Ny) = du_xL;      // Makes Last Column L // (du/dx)(L,y) = g(2)
+//         //std::cout<< Lx + j*Ny << ':' << u_xL << std::endl;
+//     } 
+    
+//     int y = 0;
+//     int Ly = Ny-1;
+//     for (int i = 0; i < Ny; i++)
+//     {
+//         RHS(y*Nx + i) = du_y0;// du/dy(x,0) =  g(3)
+//         //std::cout<< y*Nx + i << ':' << u_y0 << std::endl;
+//         RHS(Ly*Nx + i) = du_yL;//du/dy(x,0) =  g(3)
+//         //std::cout<< Ly*Nx + i << ':' << u_yL << std::endl;
+//     }
+
+// }
+
+
+
+// void matrix_assemply_neumann(Eigen::SparseMatrix<double> &A, Eigen::MatrixXi& Mesh)
+// {
+//     std:: cout << "Started Matrix Assembly" << std::endl;
+//     /*
+//         This function constructs system matrix for the discretized system.
+//         This system matrix takes depends on the boundary conditions and is the discretized form
+//         of the laplacian operator.
+//     */
+//     int Ny = Mesh.rows();
+//     int Nx = Mesh.cols();
+//     int N = (Nx)*(Ny);
+
+//     int Lx = Nx-1;
+//      A.reserve(Eigen::VectorXi::Constant(A.cols(),6));
+//     for (int j = 1; j< Nx-1; j++)
+//     {
+//         A.coeffRef(j*Ny,j*Ny) = 1;
+//         A.coeffRef(j*Ny,j*Ny+1) = -1;
+//         A.coeffRef(Lx + j*Ny, Lx + j*Ny) = 1;
+//         A.coeffRef(Lx + j*Ny, (Lx + j*Ny)-1) = -1;
+//     }
+
+//     int Ly = Ny-1;
+//     for  (int i = 0; i < Ny; i++)
+//     {
+//         A.coeffRef(i,i) = 1;
+//         A.coeffRef(i,i+Nx) = -1;
+
+//         A.coeffRef(Ly*Nx + i,Ly*Nx + i) = 1;
+//         A.coeffRef(Ly*Nx + i,Ly*Nx + i-Nx) = -1;
+        
+
+//     }
+
+//      for (int i = 0; i < N; i++)
+//     {
+//         if(A.coeffRef(i,i) != 1)
+//         {
+//             A.coeffRef(i,i) = -4;
+//             A.coeffRef(i,i+1) = 1;
+//             A.coeffRef(i,i-1) = 1;
+//             A.coeffRef(i, i+ Ny) = 1;
+//             A.coeffRef(i, i - Ny) = 1;
+//         }
+//     }
+//}

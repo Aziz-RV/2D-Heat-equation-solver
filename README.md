@@ -26,7 +26,10 @@ Analytical Solution: u(x,y) = cos(pi * x)* sinh(pi* y)
 
 
 # Results
-![Screenshot 2022-01-02 212630](https://user-images.githubusercontent.com/73020056/147888619-99e38ad6-623b-4c16-8b90-f3cb6196daf9.png)
+![Solution_example](https://user-images.githubusercontent.com/73020056/149139350-50a87d8a-1b50-492e-a9bf-9801de4ce2ff.jpg)
+Conditions: Dirichlet(u(0,y)=10, u(x,L)=7, 0 for the rest of t the boundaries)
+Method: Gauss-Seidel
+
 
 # Building 
 This project was made on Linux, you can run it easily using the Cmakelist.txt.

@@ -22,9 +22,9 @@ class Pde_Solver
         
 
     protected:
-        int _Nx; // Number of points in the mesh along x-axis
-        int _Ny; // Number of points in the mesh along y-axis
-        int _N;
+        std:: size_t _Nx; // Number of points in the mesh along x-axis
+        std:: size_t _Ny; // Number of points in the mesh along y-axis
+        std::size_t _N;
         const double _hx; 
         const double _hy;
         Eigen::MatrixXi _Mesh;

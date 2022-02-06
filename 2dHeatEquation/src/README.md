@@ -1,10 +1,11 @@
 
 Here we have all the source codes.
 
-- heat_equation.cpp: This is the main solver. This file asks the user for the domain (only rectangular domains) on which the steady statae heat equation is to be solved. Moreover, it asks the user for 			the mesh-sizes along the x and the y direction and it also asks for the boundary values. This solver works for both Dirichlet boundaries and Mixed (3 sides Dirchlet and 1 side 				Neumann) boundaries. As of now only constant boundary values are accepted. Additionally this solver allows the user to choose the linear-solver that is used to solve the linear 			system obtain upon discretizing the PDE. The three linear solvers are: 1) LU Solver (From Eigen), 2) Jacobi Solver, 3) Gauss Seidel Solver. The results of this file are two csv 			files, one of which contains the mesh (2 matrices X and Y) and the second contains the solution vector.
+- heat_equation.cpp: This is the main solver. This file asks the user for the domain (only rectangular domains) on which the steady state heat equation is to be solved. Moreover, it asks the user for 			the mesh-sizes along the x and the y direction and it also asks for the boundary values. This solver works for both Dirichlet boundaries and Mixed (3 sides Dirchlet and 1 side 				Neumann) boundaries. As of now only constant boundary values are accepted. Additionally this solver allows the user to choose the linear-solver that is used to solve the linear 			system obtain upon discretizing the PDE. The three linear solvers are: 1) LU Solver (From Eigen), 2) Jacobi Solver, 3) Gauss Seidel Solver. The results of this file are two csv 			files, one of which contains the mesh (2 matrices X and Y) and the second contains the solution vector.
 			** Dependencies: 1) pde_solver.h; 2) dirichlet_solver.h; 3) neumann_dirichlet_solver.h; 4) Linear_solver.h; 5) LU_solver_eigen.h; 6) Jacobi_solver.h; 7) Gauss_Seidel_solver.h; 
-			8) Eigen**
+			8) Eigen; 9)utilities.h**
 			
+- utilities.h: This project has two utilities.h files. One (this) is used by the main solver and the other is used for convergence tests. This utilities.h contains the functions that asks the user about the domain specifications and checks them if the values are valid.
 			
 //////////////////////////////////////////////////////////////////////////////////////////////
 

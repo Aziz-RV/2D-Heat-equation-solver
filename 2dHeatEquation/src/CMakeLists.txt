@@ -14,3 +14,4 @@ target_link_libraries (TEST_dirichlet Eigen3::Eigen)
 add_executable (TEST_Neumann Tests/test_neumann.cpp Tests/utilities.cpp)
 # Add a test case, which simply runs some tests with different configurations
 target_link_libraries (TEST_Neumann Eigen3::Eigen)
+set (CMAKE_CXX_FLAGS "-O3")

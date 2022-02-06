@@ -26,7 +26,7 @@ double Linear_Solver::error_estimation_inf_norm(Eigen::VectorXd &x_numerical,
                 error = num;
             }
         } 
-            return error;
+        return error;
     }
 
 

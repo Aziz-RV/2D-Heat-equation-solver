@@ -7,6 +7,8 @@
 #include<Eigen/Sparse>
 #include<string>
 #include <fstream>
+#include <algorithm>
+#include <chrono>
 
 
 class Linear_Solver

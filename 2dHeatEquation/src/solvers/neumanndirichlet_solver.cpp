@@ -1,7 +1,8 @@
 #include "neumanndirichlet_solver.h"
+
 Neumann_Dirichlet::Neumann_Dirichlet(const double x0, const double xL, const double y0,
                 const double yL, const double hx, const double hy):
-        Pde_Solver(x0,  xL, y0,yL,  hx, hy)
+        Pde_Solver(x0,  xL, y0,yL, hx, hy)
         {
             std::cout << "You have selected Neumann_Dirichlet Boundaries"<< std::endl;
         }
@@ -28,35 +29,31 @@ void Neumann_Dirichlet::matrix_assembly()
 {
     std:: cout << "Started Matrix Assembly" << std::endl;
 
-    int Ny = _Mesh.rows();
-    int Nx = _Mesh.cols();
-    int N = (Nx)*(Ny);
-
-    int Lx = Nx-1;
+    int Lx = _Nx-1;
     _A.reserve(Eigen::VectorXi::Constant(_A.cols(),6));
-    for (int j = 1; j< Nx-1; j++)
+    for (int j = 1; j< _Nx-1; j++)
     {
-        _A.coeffRef(j*Ny,j*Ny) = 1;
-        _A.coeffRef(Lx + j*Ny, Lx + j*Ny) = 1;
-        _A.coeffRef(Lx + j*Ny, (Lx + j*Ny)-1) = -1;
+        _A.coeffRef(j*_Ny,j*_Ny) = 1;
+        _A.coeffRef(Lx + j*_Ny, Lx + j*_Ny) = 1;
+        _A.coeffRef(Lx + j*_Ny, (Lx + j*_Ny)-1) = -1;
     }
 
-    int Ly = Ny-1;
-    for  (int i = 0; i < Ny; i++)
+    int Ly = _Ny-1;
+    for  (int i = 0; i < _Ny; i++)
     {
         _A.coeffRef(i,i) = 1;
-        _A.coeffRef(Ly*Nx + i,Ly*Nx + i) = 1;
+        _A.coeffRef(Ly*_Nx + i,Ly*_Nx + i) = 1;
     }
 
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < _N; i++)
     {
         if(_A.coeffRef(i,i) != 1)
         {
             _A.coeffRef(i,i) = -4;
             _A.coeffRef(i,i+1) = 1;
             _A.coeffRef(i,i-1) = 1;
-            _A.coeffRef(i, i+ Ny) = 1;
-            _A.coeffRef(i, i - Ny) = 1;
+            _A.coeffRef(i, i+ _Ny) = 1;
+            _A.coeffRef(i, i - _Ny) = 1;
         }
     }
 }
@@ -65,23 +62,21 @@ void Neumann_Dirichlet::matrix_assembly()
 void Neumann_Dirichlet::rhs_assembly() 
 {
     std:: cout << "Working on RHS vector" << std::endl;
-    int Nx = _Mesh.cols();
-    int Ny = _Mesh.rows();
 
     int x = 0; 
-    int Lx = Nx-1; 
-    for (int j = 1; j < Nx-1; j++) 
+    int Lx = _Nx-1; 
+    for (int j = 1; j < _Nx-1; j++) 
     {   
-        _RHS(x + j*Ny) = _u_x0;      
-        _RHS(Lx + j*Ny) = _du_dxL;     
+        _RHS(x + j*_Ny) = _u_x0;      
+        _RHS(Lx + j*_Ny) = _du_dxL;     
     } 
     
     int y = 0;
-    int Ly = Ny-1;
-    for (int i = 0; i < Ny; i++)
+    int Ly = _Ny-1;
+    for (int i = 0; i < _Ny; i++)
     {
-        _RHS(y*Nx + i) = _u_y0;
-        _RHS(Ly*Nx + i) = _u_yL;
+        _RHS(y*_Nx + i) = _u_y0;
+        _RHS(Ly*_Nx + i) = _u_yL;
     }
 }
 

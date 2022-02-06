@@ -6,7 +6,6 @@
 #include <fstream>
 #include "pde_solver.h"
 
-
         
 Pde_Solver::Pde_Solver(const double x0, const double xL, const double y0,const double yL, const double hx, const double hy)
                 : _x0(x0), _xL(xL), _y0(y0), _yL(yL), _hx(hx), _hy(hy)
@@ -72,7 +71,7 @@ void Pde_Solver::discretize_domain()
         m++;
     }
 }
-            
+
 
 void Pde_Solver::meshgrid()
 {
@@ -88,7 +87,8 @@ void Pde_Solver::meshgrid()
 
 
 void Pde_Solver::write_meshgrid_to_csv(std::string filename)
-{   std::cout <<"Writing meshgrid to mesh.csv"<< std::endl;
+{   
+    std::cout <<"Writing meshgrid to mesh.csv"<< std::endl;
     std::ofstream csv_file(filename);
 
     for (int i = 0; i < _X.rows(); i++)
@@ -124,8 +124,6 @@ void Pde_Solver::render_solution()
             std::cout << "LU_Solver Error: "<< error << std::endl;
             __LU_solver.write_result_vector_to_csv();
             break;
-        
-
         }
         case 1:
         {
@@ -138,7 +136,6 @@ void Pde_Solver::render_solution()
             std::cout << "Jacobi Error: "<< error << std::endl;
             __jacobi_solver.write_result_vector_to_csv();
             break;
-        
         }
         case 2:
         {
@@ -151,13 +148,8 @@ void Pde_Solver::render_solution()
             std::cout << "Gauss Seidel Error: "<< error << std::endl; 
             __Gauss_Seidel_solver.write_result_vector_to_csv();
             break;
-            
-            
         }
     }
-
-    
-
 }
 
 
